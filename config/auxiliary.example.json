@@ -1,0 +1,124 @@
+{
+  "schema_version": "0.2",
+  "config_id": "auxiliary-example",
+  "revision": 1,
+  "description": "仅虚构示例：明确辅助编码/名称优先，再用配置的后缀策略；实际规则须审核",
+  "scope": {
+    "source_chart_id": "example-external",
+    "target_chart_id": "example-internal"
+  },
+  "source_profile": {
+    "format": "dotted_account_ledger",
+    "worksheet_name": null,
+    "selection_policy": "require_unique_source_sheet"
+  },
+  "rules": [
+    {
+      "id": "date-month-end",
+      "kind": "date",
+      "status": "confirmed",
+      "policy": "period_month_end",
+      "parameters": {},
+      "evidence": [
+        {
+          "kind": "user_confirmation",
+          "reference": "会话原始交接提示词：已确认业务规则A"
+        }
+      ],
+      "review": {
+        "reviewed_by": "项目用户（原始交接提示词）",
+        "reviewed_on": "2026-10-28",
+        "reason": "用户已确认规则A：最终导入日期统一为账期月末；本日记录该既有确认"
+      }
+    },
+    {
+      "id": "hierarchy-group-check",
+      "kind": "hierarchy",
+      "status": "candidate",
+      "policy": "verified_group_totals",
+      "parameters": {},
+      "evidence": [
+        {
+          "kind": "synthetic_example",
+          "reference": "格式示例，实际策略及辅助条件尚未确认"
+        }
+      ],
+      "review": null
+    },
+    {
+      "id": "auxiliary-requirements",
+      "kind": "auxiliary",
+      "status": "candidate",
+      "policy": "review_requirements",
+      "parameters": {
+        "required_fields": []
+      },
+      "evidence": [
+        {
+          "kind": "synthetic_example",
+          "reference": "格式示例，实际策略及辅助条件尚未确认"
+        }
+      ],
+      "review": null
+    }
+  ],
+  "mappings": [
+    {
+      "id": "mapping-example",
+      "source_code": "9000.01",
+      "target_code": "990001",
+      "target_name": "示例科目（虚构）",
+      "status": "candidate",
+      "evidence": [
+        {
+          "kind": "synthetic_example",
+          "reference": "此项为虚构示例，不是历史候选或财务确认"
+        }
+      ],
+      "review": null
+    }
+  ],
+  "auxiliary_profile": {
+    "id": "auxiliary-example-profile",
+    "status": "candidate",
+    "applicability": {
+      "period": "202606",
+      "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "source_field": "subject_name",
+    "source_priority": [
+      "explicit_code",
+      "explicit_name",
+      "subject_name"
+    ],
+    "delimiter": "_",
+    "strategy": "exact_two_components",
+    "known_target_codes": [
+      "990001"
+    ],
+    "account_requirements": [
+      {
+        "target_code": "990001",
+        "fields": [
+          "customer"
+        ],
+        "reference": "合成目标科目备查"
+      }
+    ],
+    "dictionary": [
+      {
+        "field": "customer",
+        "code": "K001",
+        "name": "虚构客户甲",
+        "reference": "合成辅助档案"
+      }
+    ],
+    "evidence": [
+      {
+        "kind": "synthetic_example",
+        "reference": "全部虚构，不能用于真实企业配置"
+      }
+    ],
+    "review": null
+  }
+}

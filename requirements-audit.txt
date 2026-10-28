@@ -1,0 +1,2 @@
+# T02 兼容读取审计已验证版本；不替代历史 artifact_tool 依赖。
+openpyxl==3.1.5

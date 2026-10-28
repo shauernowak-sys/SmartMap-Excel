@@ -1,0 +1,81 @@
+{
+  "schema_version": "0.2",
+  "config_id": "synthetic-example",
+  "revision": 1,
+  "description": "仅演示配置格式；虚构科目，不用于企业数据转换",
+  "scope": {
+    "source_chart_id": "example-external",
+    "target_chart_id": "example-internal"
+  },
+  "source_profile": {
+    "format": "dotted_account_ledger",
+    "worksheet_name": null,
+    "selection_policy": "require_unique_source_sheet"
+  },
+  "rules": [
+    {
+      "id": "date-month-end",
+      "kind": "date",
+      "status": "confirmed",
+      "policy": "period_month_end",
+      "parameters": {},
+      "evidence": [
+        {
+          "kind": "user_confirmation",
+          "reference": "会话原始交接提示词：已确认业务规则A"
+        }
+      ],
+      "review": {
+        "reviewed_by": "项目用户（原始交接提示词）",
+        "reviewed_on": "2026-10-28",
+        "reason": "用户已确认规则A：最终导入日期统一为账期月末；本日记录该既有确认"
+      }
+    },
+    {
+      "id": "hierarchy-group-check",
+      "kind": "hierarchy",
+      "status": "candidate",
+      "policy": "verified_group_totals",
+      "parameters": {},
+      "evidence": [
+        {
+          "kind": "synthetic_example",
+          "reference": "格式示例，实际策略及辅助条件尚未确认"
+        }
+      ],
+      "review": null
+    },
+    {
+      "id": "auxiliary-requirements",
+      "kind": "auxiliary",
+      "status": "candidate",
+      "policy": "review_requirements",
+      "parameters": {
+        "required_fields": []
+      },
+      "evidence": [
+        {
+          "kind": "synthetic_example",
+          "reference": "格式示例，实际策略及辅助条件尚未确认"
+        }
+      ],
+      "review": null
+    }
+  ],
+  "mappings": [
+    {
+      "id": "mapping-example",
+      "source_code": "9000.01",
+      "target_code": "990001",
+      "target_name": "示例科目（虚构）",
+      "status": "candidate",
+      "evidence": [
+        {
+          "kind": "synthetic_example",
+          "reference": "此项为虚构示例，不是历史候选或财务确认"
+        }
+      ],
+      "review": null
+    }
+  ]
+}

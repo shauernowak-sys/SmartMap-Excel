@@ -1,0 +1,3 @@
+# 仅记录历史 README 声明的 V0.1 依赖，不代表已验证可安装。
+# 历史版本未锁定；当前 bundled Python 不含此包。T02 需核验发行来源及 API 兼容性。
+artifact-tool

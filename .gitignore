@@ -1,0 +1,32 @@
+# 企业业务数据及敏感报告（合成测试数据应放 tests/fixtures/）
+/samples/
+/reports/
+/outputs/
+/docs/*
+!/docs/使用说明.md
+/verifier/**/results/
+# 业务审计文档包含企业数据，默认仅本地保存
+/docs/00_环境与数据保护.md
+/docs/01_项目接管审计.md
+/docs/02_转换规则与差异分析.md
+/docs/03_系统导入模板适配方案.md
+/docs/20_结转识别与辅助名称策略复验.md
+/docs/22_本案例最终交付与验收.md
+/config/local/
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+*.csv
+*.tsv
+# 本地环境、缓存及凭据
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+.env.*
+!.env.example
+*.log
+~$*

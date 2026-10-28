@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SmartMap Excel V0.2 配置",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "config_id", "revision", "description", "scope", "source_profile", "rules", "mappings"],
+  "properties": {
+    "schema_version": {"const": "0.2"},
+    "config_id": {"$ref": "#/$defs/id"},
+    "revision": {"type": "integer", "minimum": 1},
+    "description": {"type": "string", "minLength": 1},
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_chart_id", "target_chart_id"],
+      "properties": {"source_chart_id": {"$ref": "#/$defs/id"}, "target_chart_id": {"$ref": "#/$defs/id"}}
+    },
+    "source_profile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["format", "worksheet_name", "selection_policy"],
+      "properties": {
+        "format": {"const": "dotted_account_ledger"},
+        "worksheet_name": {"type": ["string", "null"], "minLength": 1},
+        "selection_policy": {"const": "require_unique_source_sheet"},
+        "closing_recognition": {"$ref": "#/$defs/closing_recognition"},
+        "voucher_prefixes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "header_aliases": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "date": {"$ref": "#/$defs/aliases"}, "period": {"$ref": "#/$defs/aliases"},
+            "subject": {"$ref": "#/$defs/aliases"}, "subject_code": {"$ref": "#/$defs/aliases"},
+            "voucher": {"$ref": "#/$defs/aliases"}, "category": {"$ref": "#/$defs/aliases"},
+            "summary": {"$ref": "#/$defs/aliases"}, "debit": {"$ref": "#/$defs/aliases"}, "credit": {"$ref": "#/$defs/aliases"}
+            ,"customer": {"$ref": "#/$defs/aliases"}, "customer_code": {"$ref": "#/$defs/aliases"},
+            "supplier": {"$ref": "#/$defs/aliases"}, "supplier_code": {"$ref": "#/$defs/aliases"},
+            "employee": {"$ref": "#/$defs/aliases"}, "employee_code": {"$ref": "#/$defs/aliases"},
+            "department": {"$ref": "#/$defs/aliases"}, "department_code": {"$ref": "#/$defs/aliases"},
+            "project": {"$ref": "#/$defs/aliases"}, "project_code": {"$ref": "#/$defs/aliases"},
+            "stock_name": {"$ref": "#/$defs/aliases"}, "stock_name_code": {"$ref": "#/$defs/aliases"}
+          }
+        }
+      }
+    },
+    "rules": {"type": "array", "items": {"$ref": "#/$defs/rule"}, "minItems": 1},
+    "mappings": {"type": "array", "items": {"$ref": "#/$defs/mapping"}}
+    ,"auxiliary_profile": {"$ref": "#/$defs/auxiliary_profile"}
+  },
+  "$defs": {
+    "closing_recognition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["account_roles", "summary_hints", "reference"],
+      "properties": {
+        "applicability": {"$ref": "#/$defs/case_applicability"},
+        "account_roles": {"type": "object"},
+        "summary_hints": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "reference": {"type": "string", "minLength": 1}
+      }
+    },
+    "aux_field": {"enum": ["customer", "supplier", "employee", "department", "stock_name", "project", "customer_level", "inbound_type", "outbound_type"]},
+    "auxiliary_profile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "status", "applicability", "source_field", "delimiter", "strategy", "account_requirements", "dictionary", "evidence", "review"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "status": {"$ref": "#/$defs/status"},
+        "applicability": {"$ref": "#/$defs/case_applicability"},
+        "source_field": {"const": "subject_name"}, "delimiter": {"type": "string", "minLength": 1},
+        "name_validation_policy": {"enum": ["require_unique_dictionary", "source_name_reference_only"]},
+        "source_priority": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["explicit_code", "explicit_name", "subject_name"]}},
+        "known_target_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/code"}},
+        "strategy": {"const": "exact_two_components"},
+        "account_requirements": {"type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["target_code", "fields", "reference"],
+          "properties": {"target_code": {"$ref": "#/$defs/code"}, "fields": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/aux_field"}}, "reference": {"type": "string", "minLength": 1}}
+        }},
+        "dictionary": {"type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["field", "code", "name", "reference"],
+          "properties": {"field": {"$ref": "#/$defs/aux_field"}, "code": {"type": "string", "minLength": 1}, "name": {"type": "string", "minLength": 1}, "reference": {"type": "string", "minLength": 1}}
+        }},
+        "evidence": {"$ref": "#/$defs/evidence"}, "review": {"$ref": "#/$defs/review"}
+      }
+    },
+    "case_applicability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["period", "source_sha256"],
+      "properties": {
+        "period": {"type": "string", "pattern": "^[1-9][0-9]{3}(0[1-9]|1[0-2])$"},
+        "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "aliases": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "id": {"type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]*$", "minLength": 1},
+    "code": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)*$"},
+    "status": {"enum": ["candidate", "confirmed", "rejected"]},
+    "evidence": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["kind", "reference"],
+        "properties": {
+          "kind": {"enum": ["user_confirmation", "historical_analysis", "synthetic_example"]},
+          "reference": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "review": {
+      "type": ["object", "null"], "additionalProperties": false,
+      "required": ["reviewed_by", "reviewed_on", "reason"],
+      "properties": {
+        "reviewed_by": {"type": "string", "minLength": 1},
+        "reviewed_on": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "rule": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "status", "policy", "parameters", "evidence", "review"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["date", "hierarchy", "voucher_filter", "auxiliary"]},
+        "status": {"$ref": "#/$defs/status"},
+        "policy": {"type": "string", "minLength": 1},
+        "applicability": {
+          "type": "object", "additionalProperties": false,
+          "required": ["period", "source_sha256"],
+          "properties": {
+            "period": {"type": "string", "pattern": "^[1-9][0-9]{3}(0[1-9]|1[0-2])$"},
+            "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "parameters": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "summary_equals": {"type": "string", "minLength": 1},
+            "voucher_category_equals": {"type": "string", "minLength": 1},
+            "match_scope": {"const": "all_lines"},
+            "classification_equals": {"const": "closing_structure_verified"},
+            "required_fields": {"type": "array", "uniqueItems": true, "items": {"enum": ["customer", "supplier", "department", "employee", "stock_name", "stock_spec", "project"]}}
+          }
+        },
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "review": {"$ref": "#/$defs/review"}
+      }
+    },
+    "mapping": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "source_code", "target_code", "target_name", "status", "evidence", "review"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "source_code": {"$ref": "#/$defs/code"},
+        "target_code": {"$ref": "#/$defs/code"},
+        "target_name": {"type": "string", "minLength": 1},
+        "applicability": {"$ref": "#/$defs/case_applicability"},
+        "status": {"$ref": "#/$defs/status"},
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "review": {"$ref": "#/$defs/review"}
+      }
+    }
+  }
+}
